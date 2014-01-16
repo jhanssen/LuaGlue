@@ -48,8 +48,16 @@ class LuaGlue : public LuaGlueBase
 			functions.addSymbol(name.c_str(), new_func);
 			return *this;
 		}
-		
+
 		template<typename _Ret, typename... _Args>
+		LuaGlue& func(const std::string &name, std::function<_Ret(_Args...)>&& fn)
+		{
+			auto new_func = new LuaGlueFunction<typename std::remove_reference<decltype(fn)>::type>(this, name, std::forward<decltype(fn)>(fn));
+			functions.addSymbol(name.c_str(), new_func);
+			return *this;
+		}
+
+                template<typename _Ret, typename... _Args>
 		_Ret invokeFunction(const std::string &name, _Args... args)
 		{
 			const unsigned int Arg_Count_ = sizeof...(_Args);
